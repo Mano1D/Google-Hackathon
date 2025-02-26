@@ -1,7 +1,7 @@
 # Google-Hackathon
 # AI IDE Debugger with AI Code Generation
 
-This project is a web-based code syntax checker that allows users to write code in Python, JavaScript, and Java, check its syntax, run the code (currently only for Python and JavaScript), and even generate code from natural language questions using an AI model.
+This project is a web-based ide debugger that allows users to write code in Python, JavaScript, and Java, check its syntax, run the code (currently only for Python and JavaScript), and even generate code from natural language questions using an AI model.
 
 ## Features
 
