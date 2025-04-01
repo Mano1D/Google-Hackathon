@@ -1,0 +1,8 @@
+{
+    "name": "code-checker",
+    "version": "1.0.0",
+    "dependencies": {
+      "@babel/eslint-parser": "^7.21.11",  
+      "eslint": "^8.45.0" 
+    }
+  }

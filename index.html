@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI IDE Debugger</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <div class="container">
+        <div class="code-section">
+            <h1>Code Syntax Checker</h1>
+            <select id="languageSelect">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="java">Java</option>
+            </select><br><br>
+            <div class="code-editor">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <textarea id="codeInput" placeholder="Write your code here..." oninput="updateLineNumbers()"></textarea>
+            </div><br><br>
+            <button onclick="checkCode()">Check Syntax</button>
+            <button onclick="runCode()">Run</button>
+        </div>
+
+        <div class="output-section">
+            <h2>Result:</h2>
+            <div id="result">Waiting for result...</div>
+            <div class="chat-container">
+                <textarea class="chat-box" id="chatBox" placeholder="Ask a programming question..."></textarea>
+                <button class="upload-button" onclick="chatWithAI()"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script> </body>
+</html>
