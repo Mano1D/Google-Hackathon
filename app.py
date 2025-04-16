@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-<<<<<<< HEAD
 import requests
 import os
 import ast
@@ -31,7 +30,6 @@ def check_code():
     if not code or not language:
         return jsonify({"result": "❌ Error: Code or language not provided!"}), 400
 
-    # ✅ **Python Syntax Check**
     if language == "python":
         try:
             ast.parse(code)
@@ -39,26 +37,25 @@ def check_code():
         except SyntaxError as e:
             return jsonify({"result": f"❌ Python Syntax Error: {e.msg} at line {e.lineno}"}), 400
 
-    # ✅ **Java Syntax Check**
     elif language == "java":
         try:
-            # Ensure the user code is inside a proper Java class structure
-            java_code = f"""
-            public class Main {{
-                public static void main(String[] args) {{
-                    {code}
-                }}
-            }}
-            """
+            # Use raw code if it looks like a complete class/program
+            if "class" in code or "public static void main" in code:
+                java_code = code
+            else:
+                java_code = f"""
+public class Main {{
+    public static void main(String[] args) {{
+        {code}
+    }}
+}}
+"""
 
-            # Write Java code to a file
             with open("Main.java", "w") as f:
                 f.write(java_code)
 
-            # Compile the Java file
             compile_result = subprocess.run(["javac", "Main.java"], capture_output=True, text=True)
 
-            # If there are compilation errors, return them
             if compile_result.returncode != 0:
                 return jsonify({"result": f"❌ Java Compilation Error:\n{compile_result.stderr}"}), 400
 
@@ -67,8 +64,22 @@ def check_code():
         except Exception as e:
             return jsonify({"result": f"❌ Error: {str(e)}"}), 500
 
+    elif language == "javascript":
+        try:
+            # Check if the JS code is valid (basic check using Node.js)
+            result = subprocess.run(["node", "-e", code], capture_output=True, text=True)
+            if result.returncode != 0:
+                return jsonify({"result": f"❌ JavaScript Syntax Error:\n{result.stderr}"}), 400
+
+            return jsonify({"result": "✅ JavaScript Syntax is correct!"})
+
+        except Exception as e:
+            return jsonify({"result": f"❌ Error: {str(e)}"}), 500
+
     else:
-        return jsonify({"result": "❌ Error: Only Python and Java syntax checking are supported!"}), 400
+        return jsonify({"result": "❌ Error: Only Python, Java, and JavaScript syntax checking are supported!"}), 400
+
+
 # ✅ **AI Chatbot with OpenRouter**
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -113,31 +124,32 @@ def run_code():
     try:
         if language == "python":
             result = subprocess.run(["python", "-c", code], capture_output=True, text=True, timeout=5)
+
         elif language == "javascript":
             result = subprocess.run(["node", "-e", code], capture_output=True, text=True, timeout=5)
-        elif language == "java":
-            # Ensure the full Java program is correctly formatted
-            java_code = f"""
-            public class Main {{
-                public static void main(String[] args) {{
-                    {code}
-                }}
-            }}
-            """
 
-            # Write to Main.java
+        elif language == "java":
+            # Use full code if user wrote a class or method
+            if "class" in code or "public static void main" in code:
+                java_code = code
+            else:
+                java_code = f"""
+public class Main {{
+    public static void main(String[] args) {{
+        {code}
+    }}
+}}
+"""
+
             with open("Main.java", "w") as f:
                 f.write(java_code)
 
-            # Compile the Java file
             compile_result = subprocess.run(["javac", "Main.java"], capture_output=True, text=True, timeout=5)
             if compile_result.returncode != 0:
                 return jsonify({"output": f"❌ Compilation Error:\n{compile_result.stderr}"}), 400
 
-            # Run the compiled Java program
             result = subprocess.run(["java", "Main"], capture_output=True, text=True, timeout=5)
 
-            # Clean up generated files
             try:
                 os.remove("Main.java")
                 os.remove("Main.class")
@@ -154,30 +166,7 @@ def run_code():
         return jsonify({"output": "❌ Error: Execution timed out!"}), 400
     except Exception as e:
         return jsonify({"output": f"❌ Error: {str(e)}"}), 500
-=======
-import ast
 
-app = Flask(__name__, static_folder='', static_url_path='')  # Crucial for serving from the same directory
-CORS(app)
-
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')  # Serve index.html from the current directory
-
-@app.route('/check_code', methods=['POST'])
-def check_code():
-    # ... (rest of your code remains the same)
-    code = request.json.get('code')  # Get the code from the request
-    result = check_syntax(code)  # Use the check_syntax function to check code
-    return jsonify({"result": result})
-
-def check_syntax(code):
-    try:
-        compile(code, '<string>', 'exec')  # Python's built-in syntax checking
-        return "Code is syntactically correct!"
-    except SyntaxError as e:
-        return f"Syntax Error: {e}"
->>>>>>> d39de6f99c58c793eec1320ae271cb820a9c78be
 
 if __name__ == '__main__':
     app.run(debug=True)
